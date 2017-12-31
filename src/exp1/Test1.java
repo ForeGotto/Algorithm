@@ -35,14 +35,15 @@ public class Test1 {
 
     static void testKruskalMst() {
         System.out.println("Kruskal Mst begin:");
-        System.out.println("digraph:");
+        System.out.println("unDigraph:");
         unDigraph.kruscalMst();
         System.out.println("Kruskal Mst end");
     }
 
     static void testPrimMst() {
+        System.out.println(unDigraph);
         System.out.println("Prim Mst begin:");
-        System.out.println("digraph:");
+        System.out.println("unDigraph:");
         unDigraph.primMst(0);
         System.out.println("Prim Mst end");
     }
@@ -78,10 +79,13 @@ public class Test1 {
     public static void main(String[] args) {
 //
         unDigraph =
-                Graph.getRandomUnDigraph(20,100,100, false);
-        digraph = Graph.getRandomDigraph(20, 100, 100, false);
+                Graph.getRandomUnDigraph(5,8,100, false);
+        digraph = Graph.getRandomDigraph(5, 8, 100, false);
 
-        testAll();  
+        testBfs();
+
+//        testAll();
+
 //        TreeSet<Integer> treeSet = new TreeSet();
 //        treeSet.add(3);
 //        treeSet.add(2);

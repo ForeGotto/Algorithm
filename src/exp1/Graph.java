@@ -19,12 +19,13 @@ abstract class Graph {
     private Graph(int vertexAmount) {
         edges = new ArrayList<>(vertexAmount);
         for (int i = 0; i < vertexAmount; i++) {
-            edges.add(new ArrayList<Edge>());
+            edges.add(new ArrayList<>());
         }
     }
 
     abstract void addEdge(int from, int to, int weight);
 
+    @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder("graph:\n");
         for (int i = 0; i < edges.size(); i++) {
@@ -50,13 +51,16 @@ abstract class Graph {
             return true;
         }
 
-        ArrayList<Edge> cur = edges.get(from);
-        for (Edge edge : cur) {
-            if (edge.to == to) {
-                return true;
-            }
-        }
-        return false;
+        ArrayList<Edge> curEdgeList = edges.get(from);
+
+        return curEdgeList.stream().anyMatch(cur -> cur.to == to);
+
+//        for (Edge edge : curEdgeList) {
+//            if (edge.to == to) {
+//                return true;
+//            }
+//        }
+//        return false;
     }
 
     public abstract void primMst(int r);
@@ -238,7 +242,6 @@ abstract class Graph {
             if (noMoreSon) {
                 curVertices.color = BLACK;
                 curVertices.f = ++time;
-//                System.out.println("no more son "+ curVertices);
                 queue.remove(0);
             }
         }
@@ -308,10 +311,12 @@ abstract class Graph {
             super(vertexAmount);
         }
 
+        @Override
         void addEdge(int from, int to, int weight) {
             edges.get(from).add(new Edge(from, to, weight));
         }
 
+        @Override
         public void getDirectComponent() {
             int vertexAmount = edges.size();
             DfsVertices[] vertex = new DfsVertices[vertexAmount];
@@ -387,6 +392,7 @@ abstract class Graph {
                 DfsVertices curVertices = queue.get(0);
                 ArrayList<Edge> curEdges = edges.get(curVertices.id);
                 boolean noMoreSon = true;
+
                 for (Edge edge : curEdges) {
                     DfsVertices destVertices = vertex[edge.to];
                     if (destVertices.color == WHITE) {
@@ -411,7 +417,6 @@ abstract class Graph {
         @Override
         public void primMst(int r) {
             System.out.println("unsupported method for digraph");
-
         }
 
         @Override
@@ -426,11 +431,13 @@ abstract class Graph {
             super(vertexAmount);
         }
 
+        @Override
         void addEdge(int from, int to, int weight) {
             edges.get(from).add(new Edge(from, to, weight));
             edges.get(to).add(new Edge(to, from, weight));
         }
 
+        @Override
         public void primMst(int r) {
             int verticesAmount = edges.size();
             if (r < 0 || r >= verticesAmount) {
@@ -465,28 +472,21 @@ abstract class Graph {
                 weightSum += vertices.key;
             }
             System.out.println("primMst\n" + Arrays.toString(vertex) + "\nweight sum : " + weightSum);
-//            for (PrimVertices vertices : vertex) {
-//                System.out.print(vertices + "\t");
-//            }
-//
-//            System.out.println(weightSum);
         }
 
         @Override
         public void kruscalMst() {
-            Comparator comparator = new Comparator() {
-                @Override
-                public int compare(Object o1, Object o2) {
-                    Edge edge1 = (Edge) o1;
-                    Edge edge2 = (Edge) o2;
-                    if (edge1.weight < edge2.weight) {
-                        return -1;
-                    }
-                    if (edge1.weight > edge2.weight) {
-                        return 1;
-                    }
-                    return 0;
-                }
+            Comparator comparator = (o1, o2) -> {
+                Edge edge1 = (Edge) o1;
+                Edge edge2 = (Edge) o2;
+                return Integer.compare(edge1.weight, edge2.weight);
+//                if (edge1.weight < edge2.weight) {
+//                    return -1;
+//                }
+//                if (edge1.weight > edge2.weight) {
+//                    return 1;
+//                }
+//                return 0;
             };
             int edgesNum = 0;
             for (ArrayList<Edge> edgeArrayList : edges) {
@@ -545,25 +545,28 @@ abstract class Graph {
             this.weight = weight;
         }
 
+        @Override
         public boolean equals(Object o) {
             Edge oEdge = (Edge) o;
             return from == oEdge.from && to == oEdge.to;
         }
 
+        @Override
         public String toString() {
-            return "( " + from + "->" + to + ", " + weight + " ) ";
+            return "( " + from + "->" + to + ", " + weight + " )\n";
         }
 
         @Override
         public int compareTo(Object o) {
             Edge eo = (Edge) o;
-            if (to < eo.to) {
-                return -1;
-            }
-            if (to > eo.to) {
-                return 1;
-            }
-            return 0;
+            return Integer.compare(to, eo.to);
+//            if (to < eo.to) {
+//                return -1;
+//            }
+//            if (to > eo.to) {
+//                return 1;
+//            }
+//            return 0;
         }
 
     }
@@ -578,15 +581,17 @@ abstract class Graph {
         @Override
         public int compareTo(Object o) {
             Vertices oVertices = (Vertices) o;
-            if (oVertices.id < id) {
-                return 1;
-            }
-            if (oVertices.id > id) {
-                return -1;
-            }
-            return 0;
+            return Integer.compare(id, oVertices.id);
+//            if (oVertices.id < id) {
+//                return 1;
+//            }
+//            if (oVertices.id > id) {
+//                return -1;
+//            }
+//            return 0;
         }
 
+        @Override
         public String toString() {
             return "(" + id + ") ";
         }
@@ -604,6 +609,7 @@ abstract class Graph {
             color = WHITE;
         }
 
+        @Override
         public String toString() {
             return "(" + pi + "->" + id + ", " + d + ") ";
         }
@@ -623,17 +629,20 @@ abstract class Graph {
             f = -1;
         }
 
+        @Override
         public int compareTo(Object o) {
             DfsVertices oVertices = (DfsVertices) o;
-            if (oVertices.f < f) {
-                return 1;
-            }
-            if (oVertices.f > f) {
-                return -1;
-            }
-            return 0;
+            return Integer.compare(f, oVertices.f);
+//            if (oVertices.f < f) {
+//                return 1;
+//            }
+//            if (oVertices.f > f) {
+//                return -1;
+//            }
+//            return 0;
         }
 
+        @Override
         public String toString() {
             return "(" + pi + "->" + id + ", " + d + ", " + f + ") ";
         }
@@ -653,15 +662,17 @@ abstract class Graph {
         @Override
         public int compareTo(Object o) {
             PrimVertices oVertices = (PrimVertices) o;
-            if (oVertices.key < key) {
-                return 1;
-            }
-            if (oVertices.key > key) {
-                return -1;
-            }
-            return 0;
+            return Integer.compare(key, oVertices.key);
+//            if (oVertices.key < key) {
+//                return 1;
+//            }
+//            if (oVertices.key > key) {
+//                return -1;
+//            }
+//            return 0;
         }
 
+        @Override
         public String toString() {
             return "( " + pi + "->" + id + " ," + key + " ) ";
         }
@@ -678,17 +689,20 @@ abstract class Graph {
             pi = -1;
         }
 
+        @Override
         public int compareTo(Object o) {
             ShortestPathVertices os = (ShortestPathVertices) o;
-            if (os.d < d) {
-                return 1;
-            }
-            if (os.d > d) {
-                return -1;
-            }
-            return 0;
+            return Integer.compare(d, os.d);
+//            if (os.d < d) {
+//                return 1;
+//            }
+//            if (os.d > d) {
+//                return -1;
+//            }
+//            return 0;
         }
 
+        @Override
         public String toString() {
             return "(" + pi + "->" + id + "," + d + ") ";
         }
